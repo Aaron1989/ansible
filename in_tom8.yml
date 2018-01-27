@@ -1,0 +1,56 @@
+---
+- name: Install Tomcat
+  vars_files:
+    - pars/in_tom8_par.yml
+  vars:
+    tomcat_basename: "{{tomcat_vname}}-{{tomcat_port}}"
+  hosts: "{{ hostname }}"
+  tasks:
+    - name: download tomcat tarbal from OSS 
+      get_url:
+        url: "{{tomcat_url}}"
+        dest: "{{tmp_dir}}/{{tomcat_file}}"
+
+    - name: untar and rename tomcat
+      unarchive:
+        src: "{{tmp_dir}}/{{tomcat_file}}"
+        dest: "{{install_dir}}"
+        owner: root
+        group: root
+        copy: no
+    
+    - name: stop existing tomcat
+      shell: if [ -d "{{install_dir}}/{{tomcat_basename}}" ]; then /usr/bin/sh {{install_dir}}/{{tomcat_basename}}/bin/shutdown.sh > /tmp/shutdown.log 2>&1; fi;
+#      args:
+#        chdir: "{{install_dir}}/{{tomcat_basename}}/bin"
+
+    - name: rename tomcat as format
+      shell: cd /usr/local;if [ -d "tomcat-8.0-8080" ]; then rm -rf "{{install_dir}}/{{tomcat_basename}}";fi; mv "{{install_dir}}/{{tomcat_orig_name}}" "{{install_dir}}/{{tomcat_basename}}";
+
+    - name: get tomcat dirs
+      shell: ls -1 "{{install_dir}}/{{tomcat_basename}}/webapps" |egrep -v "ROOT|manager|host-manager"
+      register: cache
+
+    - name: Clean unwanted tomcat dir
+      file: 
+        name: "{{install_dir}}/{{tomcat_basename}}/webapps/{{item}}"
+        state: absent
+#        recurser: yes
+      with_items: cache.stdout_lines
+    
+    - name: update catalina.sh
+      template: src=pars/catalina.sh.j2 dest={{install_dir}}/{{tomcat_basename}}/bin/catalina.sh mode=0755
+
+    - name: update server.xml
+      template: src=pars/server.xml.j2 dest={{install_dir}}/{{tomcat_basename}}/conf/server.xml mode=0600
+
+    - name: startup tomcat 
+      shell: nohup /usr/bin/sh startup.sh > /tmp/startup.log 2>&1 &
+      args:
+        chdir: "{{install_dir}}/{{tomcat_basename}}/bin"
+      when: startup_tomcat
+ 
+    - name: remove tomcat tar
+      file:
+        path: "{{tmp_dir}}/{{tomcat_file}}" 
+        state: absent

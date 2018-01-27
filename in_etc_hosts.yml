@@ -1,0 +1,12 @@
+---
+- name: add pars in /etc/profile 
+  vars_files:
+    - pars/in_etc_hosts_par.yml
+  hosts: "{{ host }}" 
+  tasks:
+    - name: backup /etc/hosts
+      shell: cp /etc/hosts /etc/hosts.`date "+%y-%m-%d-%H-%M"`
+    - name: add host list in /etc/hosts 
+#    - debug: msg="{{ item.key }} is {{ item.values }}"
+      shell: sed -i '/{{ item }}/d' /etc/hosts && echo "{{ item }}" >> /etc/hosts
+      with_items: "{{ list }}"

@@ -1,0 +1,23 @@
+---
+- name: Install PPTP Mon
+  vars_files:
+    - pars/in_pptp_mon_par.yml
+  hosts: "{{ hostname }}"
+  tasks:
+    - name: create dir
+      file: path=/opt/pptp_agent state=directory mode=0755
+
+    - name: cp pptp file to pptp agent dir 
+      template: src="pars/{{ item }}" dest=/opt/ owner=root group=root mode=0755
+      with_items:
+        - mon.sh
+        - start_pptpd.sh
+
+    - name: enable rc.local 
+      file: path=/etc/rc.d/rc.local state=file mode=0755
+
+    - name: add start pptpd within boot
+      shell: a=`grep "start_pptpd.sh" /etc/rc.d/rc.local |wc -l`; if [ $a -eq 0 ]; then echo "/opt/pptp_agent/./start_pptpd.sh" >> /etc/rc.d/rc.local; fi
+ 
+    - name: add pptp mon in cron
+      cron: name="pptp mon" job="/usr/bin/bash /opt/pptp_agent/mon.sh > /dev/null 2>&1"

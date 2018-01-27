@@ -1,0 +1,49 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+
+# The configuration file needs to define the sources, 
+# the channels and the sinks.
+# Sources, channels and sinks are defined per agent, 
+# in this case called 'agent'
+
+agent1.sources = spooldir1
+agent1.channels = channel1
+agent1.sinks = kafka1
+
+agent1.sources.spooldir1.type = spooldir
+agent1.sources.spooldir1.channels = channel1
+#agent1.sources.spooldir1.spoolDir = /tmp/log
+agent1.sources.spooldir1.spoolDir = /tmp/logs/flume
+agent1.sources.spooldir1.deletePolicy = immediate
+
+agent1.sinks.kafka1.type = org.apache.flume.sink.kafka.KafkaSink
+agent1.sinks.kafka1.kafka.bootstrap.servers={{ kafka_servers }}
+agent1.sinks.kafka1.kafka.topic=flume
+agent1.sinks.kafka1.channel = channel1 
+
+agent1.channels.channel1.type = file
+agent1.channels.channel1.checkpoint = /tmp/flume/checkpoint
+agent1.channels.channel1.checkpointDir = /tmp/flume/checkpoint
+agent1.channels.channel1.dataDirs= /tmp/flume/data
+
+#agent1.sources.spooldir1.deletePolicy = immediate
+agent1.sources.spooldir1.deserializer.maxLineLength = 10000
+# Other config values specific to each type of channel(sink or source)
+# can be defined as well
+# In this case, it specifies the capacity of the memory channel
+# agent.channels.fileChannel.capacity = 100

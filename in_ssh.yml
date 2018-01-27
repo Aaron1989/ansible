@@ -1,0 +1,9 @@
+---
+- name: Add SSH file for new servers 
+  vars_files:
+    - pars/in_ssh_par.yml
+  hosts: "{{ master_host }}"
+  tasks:
+    - name: copy ssh file to remote hosts
+      local_action: shell pars/./in_ssh.sh {{ item }} {{ password }}
+      with_items: "{{ host }}"

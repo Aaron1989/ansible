@@ -1,0 +1,12 @@
+---
+- name: Change {{ user }} password
+  vars_files:
+    - pars/chg_pass_par.yml
+  vars:
+    user: "{{ user }}"
+    passwd: "{{ lookup('password', '{{ pass_file }}') }}"
+  hosts: "{{ hostname }}"
+  tasks:
+    - name: change password 
+      shell: echo "root:{{ passwd }}"|chpasswd
+    - debug: msg="change {{ user }} password as {{ passwd }} in {{ hostname }}"

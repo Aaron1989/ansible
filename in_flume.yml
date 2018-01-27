@@ -1,0 +1,56 @@
+# flume 客户端安装playbook
+# 2017-01-23
+
+---
+- name: Install Flume
+# 变量入口文件
+  vars_files:
+    - pars/in_flume_par.yml
+  hosts: "{{ hostname }}"
+  tasks:
+    - name: Create Flume Install Directory
+      file: path=/usr/local/flume state=directory mode=0755
+
+    - name: Create Flume Logs Directory
+      file: path=/tmp/logs/flume state=directory mode=0755
+
+    - name: Create Flume Data Directory
+      file: path=/tmp/flume/data state=directory mode=0755
+
+    - name: Create Flume Checkpoint Directory
+      file: path=/tmp/flume/checkpoint state=directory mode=0755
+
+# 下载flume安装包
+    - name: Download Flume package tar From OSS
+      get_url:
+        url: "{{flume_url}}"
+        dest: "{{tmp_dir}}/{{flume_file}}"
+# 解压tar包到/usr/local/目录下
+    - name: untar package tar
+      unarchive:
+        src: "{{tmp_dir}}/{{flume_file}}"
+        dest: /usr/local/
+        owner: root
+        group: root
+        copy: no
+# 删除安装包
+    - name: remove tar package
+      file:
+        path: "{{tmp_dir}}/{{flume_file}}"
+        state: absent
+# 将解压的flume包改名为/usr/local/flume,如果已存在flume文件夹则删除
+    - name: rename Flume as format
+      shell: cd /usr/local;if [ -d "flume" ]; then rm -rf /usr/local/flume;fi; mv apache-flume-1.7.0-bin flume;
+# copy flume 后台守护进程脚本及启动脚本
+    - name: Copy flume Start Shell Scripts
+      template: src="pars/{{ item }}" dest=/usr/local/flume/bin/ owner=root group=root mode=0755
+      with_items:
+        - flume_mon.sh
+        - start_flume.sh
+# 将flume的模板配置文件copy到目标主机/usr/local/flume/conf下
+    - name: update flume-conf
+      template: src=pars/flume-conf.j2 dest=/usr/local/flume/conf/flume-conf mode=0644
+# 将守护进程脚本添加到crontab任务计划中
+    - name: add flume in crontab
+      cron: name="flume mon" job="/usr/bin/bash /usr/local/flume/bin/flume_mon.sh > /dev/null 2>&1"
+

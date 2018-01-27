@@ -1,0 +1,4 @@
+hostname: dev-TelCon 
+pptp_server: <IP>
+con_user: dev-telcon
+con_pass: Quyiyuan2016

@@ -1,0 +1,12 @@
+---
+- name: rm SSH file for certain servers 
+  vars_files:
+    - pars/del_ssh_par.yml
+  hosts: "{{ host }}"
+  tasks:
+    - name: remove ssh file from remote hosts
+      shell: rm -rf /root/.ssh
+      register: ansible_eth0.ipv4.address 
+    - name: remove items in master node
+      local_action: shell sed -i '/{{ ansible_eth0.ipv4.address }}/d' /root/.ssh/known_hosts
+#    - debug: var=ansible_eth0.ipv4.address

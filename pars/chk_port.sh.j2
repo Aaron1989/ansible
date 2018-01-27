@@ -1,0 +1,32 @@
+#!/usr/bin/sh
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: chk_port.sh list|conflict_chk"
+    exit 1
+fi
+
+rm -rf /tmp/port_list.log
+rm -rf /tmp/port_list_new.log
+rm -rf /tmp/port_grep.log
+
+/usr/bin/firewall-cmd --list-port --zone=public > /tmp/port_list.log
+
+sed -e 's/ /\n/g' /tmp/port_list.log >> /tmp/port_list_new.log
+
+function list_port() {
+  seq=`echo "{{ proxy_port }}" |cut -b 1-2`
+
+  grep "^$seq" /tmp/port_list_new.log |sort|awk -F/ '{printf "%d,",$1}' > /tmp/port_grep.log
+}
+
+function chk_conflict() {
+  grep "^{{ proxy_port }}" /tmp/port_list_new.log |wc -l
+}
+
+if [[ $1 = "list" ]]; then
+  list_port
+elif [[ $1 = "conflict_chk" ]]; then
+  chk_conflict
+else
+  echo "Usage: chk_port.sh list|conflict_chk"
+fi

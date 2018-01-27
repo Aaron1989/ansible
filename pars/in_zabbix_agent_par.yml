@@ -1,0 +1,13 @@
+host: dev-midlayer-elk 
+server_ip: <IP>
+userpar: 1
+rpm:
+  libtool-ltdl:
+    rpm_name: libtool-ltdl-2.4.2-20.el7.x86_64.rpm 
+    oss_dir: http://ress.oss-cn-qingdao-internal.aliyuncs.com/zabbix%2Flibtool-ltdl-2.4.2-20.el7.x86_64.rpm
+  unixODBC:
+    rpm_name: unixODBC-2.3.1-11.el7.x86_64.rpm
+    oss_dir: http://ress.oss-cn-qingdao-internal.aliyuncs.com/zabbix%2FunixODBC-2.3.1-11.el7.x86_64.rpm
+  zabbix-agent:
+    rpm_name: zabbix-agent-3.0.1-1.el7.x86_64.rpm
+    oss_dir: http://ress.oss-cn-qingdao-internal.aliyuncs.com/zabbix%2Fzabbix-agent-3.0.1-1.el7.x86_64.rpm

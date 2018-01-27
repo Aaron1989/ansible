@@ -1,0 +1,11 @@
+# 目标主机名
+hostname: test-TelCon
+# flume包下载路径地址
+flume_url: http://deployment-package.oss-cn-qingdao-internal.aliyuncs.com/public/flume-1.7.0/apache-flume-1.7.0-bin.tar
+# 临时目录
+tmp_dir: /opt
+# 完整的包名称
+flume_file: apache-flume-1.7.0-bin.tar
+# kafka连接地址
+kafka_servers: <IP>:9092,<IP>:9092,<IP>:9092
+

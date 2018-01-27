@@ -1,0 +1,12 @@
+hostname: dev-midlayer-2 
+tomcat_url: http://ress.oss-cn-qingdao-internal.aliyuncs.com/TOMCAT%2Fapache-tomcat-8.0.26.tar.gz
+install_dir: /usr/local
+tomcat_file: apache-tomcat-8.0.26.tar.gz
+tomcat_orig_name: apache-tomcat-8.0.26
+tomcat_vname: tomcat-8.0
+tomcat_port: 8080
+shutdown_port: 8005
+ajp_port: 8009
+tmp_dir: /tmp
+squid_enabled: false 
+startup_tomcat: false 

@@ -1,0 +1,8 @@
+---
+- name: add vcap_services_configserver_credentials_uri par for ms-file in /etc/profile 
+  hosts: dev
+  tasks:
+    - name: backup /etc/profile
+      shell: cp /etc/profile /etc/profile.`date "+%y-%m-%d-%H-%M"`
+    - name: add par in /etc/profile 
+      shell: echo "export vcap_services_configserver_credentials_uri=http://<IP>:7777" >> /etc/profile

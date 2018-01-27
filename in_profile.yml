@@ -1,0 +1,12 @@
+---
+- name: add pars in /etc/profile 
+  vars_files:
+    - pars/in_profile_par.yml
+  hosts: "{{ host }}" 
+  tasks:
+    - name: backup /etc/profile
+      shell: cp /etc/profile /etc/profile.`date "+%y-%m-%d-%H-%M"`
+    - name: adjust par in /etc/profile 
+#    - debug: msg="{{ item.key }} is {{ item.values }}"
+      shell: sed -i '/export {{ item.key }}/d' /etc/profile && echo "export {{ item.key }}={{ item.value.set }}" >> /etc/profile
+      with_dict: "{{ par }}"

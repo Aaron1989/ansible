@@ -1,0 +1,48 @@
+---
+- name: Install zabbix agent
+  vars_files:
+    - pars/in_zabbix_agent_par.yml
+  vars:
+    tmp_dir: /tmp
+  hosts: "{{ host }}"
+  tasks:
+    - name: download rpm from OSS 
+      get_url:
+        url: "{{ item.value.oss_dir }}" 
+        dest: "{{ tmp_dir }}/{{ item.value.rpm_name }}"
+      with_dict: "{{ rpm }}"
+
+    - name: install rpm 
+      yum:
+        name: "{{ tmp_dir }}/{{ item.value.rpm_name }}"
+        state: present
+      with_dict: "{{ rpm }}"
+
+    - name: remove rpm
+      file:
+        path: "{{ tmp_dir }}/{{ item.value.rpm_name }}"
+        state: absent
+      with_dict: "{{ rpm }}"
+    
+    - name: adjust zabbix.conf
+      template: src=pars/zabbix_agentd.conf.j2 dest=/etc/zabbix/zabbix_agentd.conf mode=0600
+
+    - name: check firewall state
+      shell: /usr/bin/firewall-cmd --state |xargs echo
+      register: firewall_state
+      changed_when: false
+ 
+#    - debug: var=firewall_state
+
+    - name: Setting Firewall port Agent/10050 
+      firewalld: zone=internal port=10050/tcp permanent=true state=enabled
+#      when: firewall_state.stdout == "\u001b[91mnot running\u001b[00m"
+#      when: "'not running' not in firewall_state.stdout"
+      when: firewall_state.stdout == "running"
+
+    - name: Reload Firewall 
+      shell: /usr/bin/firewall-cmd --reload
+      when: firewall_state.stdout == "running"
+
+    - name: enable zabbix agent boot startup
+      service: name=zabbix-agent enabled=yes state=restarted

@@ -1,0 +1,37 @@
+---
+- name: Delete nginx proxy for app 
+  vars_files:
+    - pars/del_ng_proxy_par.yml
+  vars:
+  hosts: "{{ host }}" 
+  tasks:
+    - name: gen port usage list
+      shell: /tmp/chk_port.sh list; cat /tmp/port_grep.log
+      register: result_list
+    
+    - name: port verify 
+      debug: msg='the used port including {{ result_list.stdout }} you are trying to remove {{ proxy_port }}'
+
+    - name: usage port check
+      shell: /tmp/chk_port.sh conflict_chk
+      register: result_conf_chk
+ 
+#    - name: chk
+#      debug: var=result_conf_chk
+
+    - name: remove proxy file
+      file: path="/usr/local/nginx/conf/vhosts/{{ conf_env }}.{{ service_name }}{{ sequence }}.conf" state=absent
+      notify: restart nginx
+      when: result_conf_chk.stdout == "1"
+
+    - name: disable firewall port "{{ proxy_port }}"
+      firewalld: zone=public port={{ proxy_port }}/tcp permanent=true state=disabled
+      notify: reload firewall
+      when: result_conf_chk.stdout == "1" 
+
+  handlers:
+    - name: restart nginx
+      shell: /usr/local/nginx/sbin/nginx -s reload
+
+    - name: reload firewall
+      shell: /usr/bin/firewall-cmd --reload

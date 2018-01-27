@@ -1,0 +1,13 @@
+---
+- name: Create app dir
+  vars_files:
+    - pars/in_dir_par.yml
+  hosts: "{{ hostname }}"
+  tasks:
+    - name: create dir
+      file: path="{{ item }}" state=directory mode=0755
+      with_items:
+        - "/qy/{{ dirname }}"
+        - "/qy/{{ dirname }}/release"
+        - "/qy/{{ dirname }}/rollback"
+        - "/qy/{{ dirname }}/logs"

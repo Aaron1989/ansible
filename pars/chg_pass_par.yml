@@ -1,0 +1,3 @@
+hostname: dev-web 
+user: root
+pass_file: /etc/ansible/pars/pass_20160527.txt

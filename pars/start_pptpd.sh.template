@@ -1,0 +1,8 @@
+#!/bin/sh
+
+source /etc/profile
+source /root/.bash_profile
+
+pptpsetup --create pptpd --server <IP> --username dev-telcon --password Quyiyuan2016 --start
+route add -net <IP> dev ppp0
+nohup ping www.baidu.com -i 20 &

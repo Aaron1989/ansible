@@ -1,0 +1,8 @@
+---
+- name: del vcap_services_configserver_credentials_uri par for ms-file in /etc/profile 
+  hosts: dev
+  tasks:
+    - name: backup /etc/profile
+      shell: cp /etc/profile /etc/profile.`date "+%y-%m-%d-%H-%M"`
+    - name: remove par in /etc/profile
+      shell: sed -i '/vcap_services_configserver_credentials_uri/d' /etc/profile 

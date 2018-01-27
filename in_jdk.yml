@@ -1,0 +1,21 @@
+---
+- name: Install JDK
+  vars_files:
+    - pars/in_jdk_par.yml
+  vars:
+    jdk_file: jdk-8u45-linux-x64.rpm
+    tmp_dir: /tmp
+  hosts: "{{ hostname }}"
+  tasks:
+    - name: download jdk from OSS 
+      get_url:
+        url: http://ress.oss-cn-qingdao-internal.aliyuncs.com/JAVA%2Fjdk-8u45-linux-x64.rpm
+        dest: "{{tmp_dir}}/{{jdk_file}}"
+    - name: install jdk
+      yum:
+        name: "{{tmp_dir}}/{{jdk_file}}"
+        state: present
+    - name: remove jdk rpm
+      file:
+        path: "{{tmp_dir}}/{{jdk_file}}"
+        state: absent

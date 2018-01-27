@@ -1,0 +1,6 @@
+host: dev-MsHos 
+par:
+  SQL_URL:
+    set: 122 
+  SQL_USER:
+    set: ell

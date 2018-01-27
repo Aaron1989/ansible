@@ -1,0 +1,5 @@
+host: prod-JumpHost
+conf_env: aprod
+service_name: ms-disease
+sequence: _1
+proxy_port: 9010

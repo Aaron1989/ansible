@@ -1,0 +1,27 @@
+---
+- name: Install App Mon
+  hosts: dev-InfoGather
+  vars:
+    tmp_dir: /tmp
+    sudo_dir: /etc
+    zabbix_dir: /etc/zabbix/zabbix_agentd.d
+  tasks:
+    - name: download agent conf from oss 
+      get_url:
+        url: http://ress.oss-cn-qingdao.aliyuncs.com/zabbix/userparameter_app.conf
+        dest: "{{tmp_dir}}/userparameter_app.conf"
+    - name: download sudoers from oss
+      get_url:
+        url: http://ress.oss-cn-qingdao.aliyuncs.com/zabbix/sudoers
+        name: "{{tmp_dir}}/sudoers"
+    - name: backup sudoers file
+      command:
+        mv: "{{sudo_dir}}/sudoers" "{{sudo_dir}}/sudoers_bkp"
+    - name: install new sudoers file & zabbix app conf
+      command:
+        mv: "{{tmp_dir}}/sudoers" "{{sudo_dir}}/sudoers"
+        mv: "{{tmp_dir}}/userparameter_app.conf" "{{zabbix_dir}}/userparameter_app.conf"
+#    - name: remove sudoers
+#      file:
+#        path: "{{tmp_dir}}/sudoers"
+#        state: absent
